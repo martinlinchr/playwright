@@ -1,0 +1,36 @@
+services:
+  playwright:
+    # Hvis du bygger fra egen Dockerfile i repoet
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Eller brug et færdigt Playwright-image:
+    # image: mcr.microsoft.com/playwright:v1.52.0-noble
+    container_name: playwright
+    restart: unless-stopped
+
+    # Ingen ports: Traefik tager sig af routing
+    # ports:
+    #   - "3000:3000"
+
+    # Miljøvariabler – kun hvis du har brug for dem
+    environment:
+      - NODE_ENV: production
+      - APP_URL: ${APP_URL}
+
+    # Traefik labels (Dokploy læser disse når du deployer som Compose)
+    labels:
+      - "traefik.enable=true"
+
+      # HTTP router (port 80)
+      - "traefik.http.routers.playwright-web.rule=Host(`playwright.martin-linde.com`)"
+      - "traefik.http.routers.playwright-web.entrypoints=web"
+      - "traefik.http.routers.playwright-web.middlewares=redirect-to-https@file"
+
+      # HTTPS router (port 443)
+      - "traefik.http.routers.playwright-websecure.rule=Host(`playwright.martin-linde.com`)"
+      - "traefik.http.routers.playwright-websecure.entrypoints=websecure"
+      - "traefik.http.routers.playwright-websecure.tls.certresolver=letsencrypt"
+
+      # Intern container-port som din app lytter på (tilpas fx 3000/8080)
+      - "traefik.http.services.playwright.loadbalancer.server.port=3000"
