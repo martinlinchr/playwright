@@ -15,8 +15,8 @@ services:
 
     # Miljøvariabler – kun hvis du har brug for dem
     environment:
-      - NODE_ENV: production
-      - APP_URL: ${APP_URL}
+      APP_URL: ${APP_URL}
+      NODE_ENV: production
 
     # Traefik labels (Dokploy læser disse når du deployer som Compose)
     labels:
