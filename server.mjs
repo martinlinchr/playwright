@@ -21,7 +21,7 @@ app.get("/", (_req, res) => {
 async function scrapeWithPlaywright({ url, takeScreenshot }) {
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  await page.goto(url, { waitUntil: "networkidle" });
+  await page.goto(url, { waitUntil: "domcontentloaded" });
 
   const title = await page.title();
   const textContent = await page.textContent("body");
